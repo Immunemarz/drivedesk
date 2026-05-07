@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxe Mindset</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/main.js' %}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="#">Luxe Mindset</a>
+        <nav aria-label="Primary navigation">
+            <a href="#portfolio">Portfolio</a>
+            <a href="#rituals">Rituals</a>
+            <a href="#membership">Membership</a>
+        </nav>
+        <button class="nav-cta" type="button">Join Waitlist</button>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="eyebrow">Finance / Luxury / Focus</p>
+                <h1>Build the lifestyle with the operating system to sustain it.</h1>
+                <p class="hero-copy">
+                    A premium dashboard for people who study capital, collect timeless machines,
+                    and protect the calendar like an asset.
+                </p>
+                <div class="hero-actions">
+                    <a class="button primary" href="#portfolio">Explore Assets</a>
+                    <a class="button secondary" href="#rituals">View Rituals</a>
+                </div>
+            </div>
+
+            <div class="hero-panel" aria-label="Luxury performance snapshot">
+                <div class="watch-face">
+                    <span></span>
+                    <strong>10:10</strong>
+                </div>
+                <div class="market-card">
+                    <p>Private Index</p>
+                    <strong id="market-value">$284,920</strong>
+                    <span id="market-change">+4.8% this month</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="ticker" aria-label="Mindset highlights">
+            <span>Compounding taste</span>
+            <span>Precision scheduling</span>
+            <span>Mechanical excellence</span>
+            <span>Capital discipline</span>
+        </section>
+
+        <section class="section" id="portfolio">
+            <div class="section-heading">
+                <p class="eyebrow">Curated Assets</p>
+                <h2>Objects and systems for a sharper life.</h2>
+            </div>
+            <div class="product-grid">
+                {% for product in products %}
+                <article class="product-card">
+                    <p>{{ product.category }}</p>
+                    <h3>{{ product.name }}</h3>
+                    <strong>{{ product.metric }}</strong>
+                    <span>{{ product.note }}</span>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="split-section" id="rituals">
+            <div>
+                <p class="eyebrow">Daily Protocol</p>
+                <h2>Luxury is quiet when the system is loud.</h2>
+                <p>
+                    Track net worth, protect deep-work blocks, and make every purchase compete
+                    against your long-term portfolio.
+                </p>
+            </div>
+            <div class="ritual-list">
+                <button class="ritual active" type="button" data-ritual="Review markets before messages.">
+                    06:30 Market Scan
+                </button>
+                <button class="ritual" type="button" data-ritual="One focused block before meetings.">
+                    09:00 Deep Work
+                </button>
+                <button class="ritual" type="button" data-ritual="Audit purchases, plans, and energy.">
+                    20:30 Ledger Close
+                </button>
+                <p id="ritual-output">Review markets before messages.</p>
+            </div>
+        </section>
+
+        <section class="membership" id="membership">
+            <p class="eyebrow">Membership</p>
+            <h2>For ambitious people with expensive taste and serious calendars.</h2>
+            <form class="signup-form">
+                <input type="email" placeholder="Email address" aria-label="Email address">
+                <button type="submit">Request Access</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
