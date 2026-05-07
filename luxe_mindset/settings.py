@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-only-luxe-mindset-secret-key"
+SECRET_KEY = "N_Ft^ilU*N_Ej2ce"
 DEBUG = True
 ALLOWED_HOSTS = []
 
