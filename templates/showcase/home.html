@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxe Mindset</title>
+    <title>DriveDesk Supply</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -13,54 +13,68 @@
 </head>
 <body>
     <header class="site-header">
-        <a class="brand" href="#">Luxe Mindset</a>
+        <a class="brand" href="#">DriveDesk Supply</a>
         <nav aria-label="Primary navigation">
-            <a href="#portfolio">Portfolio</a>
-            <a href="#rituals">Rituals</a>
-            <a href="#membership">Membership</a>
+            <a href="#kits">Kits</a>
+            <a href="#builder">Builder</a>
+            <a href="#drop">Drop</a>
         </nav>
-        <button class="nav-cta" type="button">Join Waitlist</button>
+        <button class="nav-cta" type="button">Shop Drop</button>
     </header>
 
     <main>
         <section class="hero">
             <div class="hero-content">
-                <p class="eyebrow">Finance / Luxury / Focus</p>
-                <h1>Build the lifestyle with the operating system to sustain it.</h1>
+                <p class="eyebrow">Productivity Gear / Car Accessories / Daily Systems</p>
+                <h1>Premium gear kits for sharper desks and cleaner drives.</h1>
                 <p class="hero-copy">
-                    A premium dashboard for people who study capital, collect timeless machines,
-                    and protect the calendar like an asset.
+                    A sellable storefront concept for curated productivity gear, commute upgrades,
+                    and car accessories packaged as high-margin bundles instead of random gadgets.
                 </p>
                 <div class="hero-actions">
-                    <a class="button primary" href="#portfolio">Explore Assets</a>
-                    <a class="button secondary" href="#rituals">View Rituals</a>
+                    <a class="button primary" href="#kits">View Kits</a>
+                    <a class="button secondary" href="#builder">Build My Setup</a>
                 </div>
             </div>
 
-            <div class="hero-panel" aria-label="Luxury performance snapshot">
-                <div class="watch-face">
-                    <span></span>
-                    <strong>10:10</strong>
+            <div class="hero-panel" aria-label="DriveDesk product snapshot">
+                <div class="kit-console">
+                    <div class="console-topline">
+                        <span>Best Seller</span>
+                        <strong>Executive Reset</strong>
+                    </div>
+                    <div class="flow-row">
+                        <span>Desk upgrades</span>
+                        <strong>5</strong>
+                    </div>
+                    <div class="flow-row">
+                        <span>Car essentials</span>
+                        <strong>4</strong>
+                    </div>
+                    <div class="flow-row">
+                        <span>Bundle savings</span>
+                        <strong>22%</strong>
+                    </div>
                 </div>
-                <div class="market-card">
-                    <p>Private Index</p>
-                    <strong id="market-value">$284,920</strong>
-                    <span id="market-change">+4.8% this month</span>
+                <div class="metric-card">
+                    <p>Launch Drop Revenue</p>
+                    <strong id="drop-value">$12,400</strong>
+                    <span id="drop-change">62 bundles reserved</span>
                 </div>
             </div>
         </section>
 
-        <section class="ticker" aria-label="Mindset highlights">
-            <span>Compounding taste</span>
-            <span>Precision scheduling</span>
-            <span>Mechanical excellence</span>
-            <span>Capital discipline</span>
+        <section class="ticker" aria-label="DriveDesk highlights">
+            <span>Cable-free desk setup</span>
+            <span>MagSafe car command center</span>
+            <span>Everyday carry organization</span>
+            <span>Limited monthly product drops</span>
         </section>
 
-        <section class="section" id="portfolio">
+        <section class="section" id="kits">
             <div class="section-heading">
-                <p class="eyebrow">Curated Assets</p>
-                <h2>Objects and systems for a sharper life.</h2>
+                <p class="eyebrow">Curated Kits</p>
+                <h2>Sell bundles people can picture using every day.</h2>
             </div>
             <div class="product-grid">
                 {% for product in products %}
@@ -74,35 +88,36 @@
             </div>
         </section>
 
-        <section class="split-section" id="rituals">
+        <section class="split-section" id="builder">
             <div>
-                <p class="eyebrow">Daily Protocol</p>
-                <h2>Luxury is quiet when the system is loud.</h2>
+                <p class="eyebrow">Setup Builder</p>
+                <h2>Make the shopping experience feel personal, not like a gadget dump.</h2>
                 <p>
-                    Track net worth, protect deep-work blocks, and make every purchase compete
-                    against your long-term portfolio.
+                    Customers choose how they work and drive. The site recommends a bundle for their
+                    desk, car, and bag so the order feels intentional and premium.
                 </p>
             </div>
-            <div class="ritual-list">
-                <button class="ritual active" type="button" data-ritual="Review markets before messages.">
-                    06:30 Market Scan
+            <div class="workflow-list">
+                <button class="workflow-step active" type="button" data-detail="For students, remote workers, founders, and sales people who want a cleaner focus setup.">
+                    Desk Mode
                 </button>
-                <button class="ritual" type="button" data-ritual="One focused block before meetings.">
-                    09:00 Deep Work
+                <button class="workflow-step" type="button" data-detail="For commuters, rideshare drivers, road warriors, and anyone who wants a calmer car interior.">
+                    Drive Mode
                 </button>
-                <button class="ritual" type="button" data-ritual="Audit purchases, plans, and energy.">
-                    20:30 Ledger Close
+                <button class="workflow-step" type="button" data-detail="For buyers who want the full desk, bag, and car system in one premium bundle.">
+                    Full System
                 </button>
-                <p id="ritual-output">Review markets before messages.</p>
+                <p id="workflow-output">For students, remote workers, founders, and sales people who want a cleaner focus setup.</p>
             </div>
         </section>
 
-        <section class="membership" id="membership">
-            <p class="eyebrow">Membership</p>
-            <h2>For ambitious people with expensive taste and serious calendars.</h2>
+        <section class="pricing-band" id="drop">
+            <p class="eyebrow">Limited Drop</p>
+            <h2>Launch with 100 curated bundles, then restock what sells.</h2>
+            <p class="pricing-copy">Start with affiliate links, dropshipped products, or small wholesale inventory, then build your own branded kits once demand is proven.</p>
             <form class="signup-form">
-                <input type="email" placeholder="Email address" aria-label="Email address">
-                <button type="submit">Request Access</button>
+                <input type="email" placeholder="Email for the drop" aria-label="Email for the drop">
+                <button type="submit">Reserve My Kit</button>
             </form>
         </section>
     </main>
