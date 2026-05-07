@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | DriveDesk Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/main.js' %}" defer></script>
+</head>
+<body>
+    <div class="topbar-note">Free shipping on curated carry systems over $120</div>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">DS</span>
+            <span class="brand-text">
+                <strong>DriveDesk Supply</strong>
+                <small>Premium carry systems</small>
+            </span>
+        </a>
+        <nav class="main-nav" aria-label="Primary navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="#products">Products</a>
+            <a href="{% url 'home' %}#collection">Collection</a>
+        </nav>
+        <div class="header-actions">
+            <a class="nav-link-quiet" href="{% url 'home' %}#about">About</a>
+            <a class="nav-cta" href="{% url 'home' %}#collection">View Collection</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="catalog-hero">
+            <p class="eyebrow">Shop The System</p>
+            <h1>Start with the pouch. Add desk and car pieces only where they support the carry system.</h1>
+            <p>
+                Browse the collection by category. The carry products are the center of gravity;
+                desk and car products exist to make that same organization system travel well.
+            </p>
+        </section>
+
+        <section class="catalog-section" id="products">
+            <div class="catalog-toolbar">
+                <div>
+                    <p class="eyebrow">Browse Categories</p>
+                    <h2>Products built around one carry system.</h2>
+                </div>
+                <div class="catalog-summary">
+                    <span><strong>Hero:</strong> Tech Pouch</span>
+                    <span><strong>Best Pairing:</strong> Desk Rail</span>
+                    <span><strong>Travel Pick:</strong> Executive Carry Case</span>
+                </div>
+            </div>
+
+            <div class="tab-list" role="tablist" aria-label="Product categories">
+                {% for category in categories %}
+                <button class="tab-button{% if forloop.first %} active{% endif %}" type="button" data-category="{{ category }}">
+                    {{ category }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="catalog-grid">
+                {% for product in products %}
+                <article class="catalog-card" data-category="{{ product.category }}">
+                    <img class="catalog-image" src="{{ product.image_url }}" alt="{{ product.name }}">
+                    <div class="catalog-card-body">
+                        <p>{{ product.category }}</p>
+                        <h2>{{ product.name }}</h2>
+                        <strong>{{ product.price }}</strong>
+                        <span>{{ product.tagline }}</span>
+                        <small>{{ product.details }}</small>
+                    </div>
+                    <button type="button">Add To Cart</button>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DriveDesk Supply</title>
+    <title>DriveDesk Supply | Premium Carry Systems</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -12,73 +12,61 @@
     <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body>
+    <div class="topbar-note">Free shipping on curated carry systems over $120</div>
     <header class="site-header">
-        <a class="brand" href="#">DriveDesk Supply</a>
-        <nav aria-label="Primary navigation">
-            <a href="#kits">Kits</a>
-            <a href="#builder">Builder</a>
-            <a href="#drop">Drop</a>
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">DS</span>
+            <span class="brand-text">
+                <strong>DriveDesk Supply</strong>
+                <small>Premium carry systems</small>
+            </span>
+        </a>
+        <nav class="main-nav" aria-label="Primary navigation">
+            <a href="{% url 'products' %}">Products</a>
+            <a href="#builder">System</a>
+            <a href="#about">About</a>
+            <a href="#feedback">Feedback</a>
+            <a href="#collection">Collection</a>
         </nav>
-        <button class="nav-cta" type="button">Shop Drop</button>
+        <div class="header-actions">
+            <a class="nav-link-quiet" href="{% url 'products' %}">View Catalog</a>
+            <a class="nav-cta" href="{% url 'products' %}">Shop Pouches</a>
+        </div>
     </header>
 
     <main>
         <section class="hero">
             <div class="hero-content">
-                <p class="eyebrow">Productivity Gear / Car Accessories / Daily Systems</p>
-                <h1>Premium gear kits for sharper desks and cleaner drives.</h1>
+                <p class="eyebrow">Everyday Carry / Desk Reset / Car Organization</p>
+                <h1>The tech pouch brand for people who hate loose cables and messy carry.</h1>
                 <p class="hero-copy">
-                    A sellable storefront concept for curated productivity gear, commute upgrades,
-                    and car accessories packaged as high-margin bundles instead of random gadgets.
+                    DriveDesk Supply is built around one winning hero: a premium everyday carry tech pouch.
+                    Desk tools and car pieces support that system, but the brand starts with carry.
                 </p>
                 <div class="hero-actions">
-                    <a class="button primary" href="#kits">View Kits</a>
-                    <a class="button secondary" href="#builder">Build My Setup</a>
+                    <a class="button primary" href="{% url 'products' %}">Shop The Pouch</a>
+                    <a class="button secondary" href="#about">Why It Works</a>
                 </div>
             </div>
 
-            <div class="hero-panel" aria-label="DriveDesk product snapshot">
-                <div class="kit-console">
-                    <div class="console-topline">
-                        <span>Best Seller</span>
-                        <strong>Executive Reset</strong>
-                    </div>
-                    <div class="flow-row">
-                        <span>Desk upgrades</span>
-                        <strong>5</strong>
-                    </div>
-                    <div class="flow-row">
-                        <span>Car essentials</span>
-                        <strong>4</strong>
-                    </div>
-                    <div class="flow-row">
-                        <span>Bundle savings</span>
-                        <strong>22%</strong>
-                    </div>
-                </div>
-                <div class="metric-card">
-                    <p>Launch Drop Revenue</p>
-                    <strong id="drop-value">$12,400</strong>
-                    <span id="drop-change">62 bundles reserved</span>
-                </div>
-            </div>
         </section>
 
         <section class="ticker" aria-label="DriveDesk highlights">
-            <span>Cable-free desk setup</span>
-            <span>MagSafe car command center</span>
-            <span>Everyday carry organization</span>
-            <span>Limited monthly product drops</span>
+            <span>One pouch for your daily essentials</span>
+            <span>Cleaner bag, cleaner desk, cleaner car</span>
+            <span>Premium organization without gadget clutter</span>
+            <span>Carry systems built for everyday use</span>
         </section>
 
         <section class="section" id="kits">
             <div class="section-heading">
-                <p class="eyebrow">Curated Kits</p>
-                <h2>Sell bundles people can picture using every day.</h2>
+                <p class="eyebrow">Core Collection</p>
+                <h2>Lead with carry, then expand into desk and car support pieces.</h2>
             </div>
             <div class="product-grid">
                 {% for product in products %}
                 <article class="product-card">
+                    <img class="product-card-image" src="{{ product.image_url }}" alt="{{ product.name }}">
                     <p>{{ product.category }}</p>
                     <h3>{{ product.name }}</h3>
                     <strong>{{ product.metric }}</strong>
@@ -90,34 +78,62 @@
 
         <section class="split-section" id="builder">
             <div>
-                <p class="eyebrow">Setup Builder</p>
-                <h2>Make the shopping experience feel personal, not like a gadget dump.</h2>
+                <p class="eyebrow">The System</p>
+                <h2>The brand works because it solves one boring pain across three environments.</h2>
                 <p>
-                    Customers choose how they work and drive. The site recommends a bundle for their
-                    desk, car, and bag so the order feels intentional and premium.
+                    The customer is the same person all day. Their pouch leaves the house, lands on the desk,
+                    rides in the car, and keeps the small essentials from turning into clutter.
                 </p>
             </div>
             <div class="workflow-list">
-                <button class="workflow-step active" type="button" data-detail="For students, remote workers, founders, and sales people who want a cleaner focus setup.">
-                    Desk Mode
+                <button class="workflow-step active" type="button" data-detail="Carry mode starts with a premium tech pouch for charger, cords, pen, cloth, and the small tools that usually float loose.">
+                    Carry First
                 </button>
-                <button class="workflow-step" type="button" data-detail="For commuters, rideshare drivers, road warriors, and anyone who wants a calmer car interior.">
-                    Drive Mode
+                <button class="workflow-step" type="button" data-detail="Desk mode adds cable control and riser pieces so the pouch becomes a mobile setup instead of a drawer of loose accessories.">
+                    Desk Support
                 </button>
-                <button class="workflow-step" type="button" data-detail="For buyers who want the full desk, bag, and car system in one premium bundle.">
-                    Full System
+                <button class="workflow-step" type="button" data-detail="Drive mode adds the mount, organizer, and glovebox pouch so the same system follows the customer through the commute.">
+                    Drive Support
                 </button>
-                <p id="workflow-output">For students, remote workers, founders, and sales people who want a cleaner focus setup.</p>
+                <p id="workflow-output">Carry mode starts with a premium tech pouch for charger, cords, pen, cloth, and the small tools that usually float loose.</p>
             </div>
         </section>
 
-        <section class="pricing-band" id="drop">
-            <p class="eyebrow">Limited Drop</p>
-            <h2>Launch with 100 curated bundles, then restock what sells.</h2>
-            <p class="pricing-copy">Start with affiliate links, dropshipped products, or small wholesale inventory, then build your own branded kits once demand is proven.</p>
+        <section class="section about-section" id="about">
+            <div class="section-heading">
+                <p class="eyebrow">About Us</p>
+                <h2>We build products for people who want their everyday setup to feel easier, cleaner, and sharper.</h2>
+                <p class="about-copy">
+                    DriveDesk Supply was made for the moments that usually feel small but annoying: cables at the bottom of the bag,
+                    chargers floating loose, pens disappearing, and the same clutter following you from home to work to the car.
+                    Our products are designed to feel convenient without looking cheap, overbuilt, or gadget-heavy. The result is a
+                    collection that looks premium, travels well, and makes daily routines noticeably smoother.
+                </p>
+            </div>
+            <div class="about-grid">
+                <article class="about-card">
+                    <h3>Convenience First</h3>
+                    <p>Quick-access pockets, compact layouts, and pieces that move naturally between bag, desk, and car.</p>
+                </article>
+                <article class="about-card">
+                    <h3>Premium Feel</h3>
+                    <p>Clean materials, intentional silhouettes, and storage that feels refined instead of overly tactical.</p>
+                </article>
+                <article class="about-card">
+                    <h3>Actually Useful</h3>
+                    <p>Everything in the line exists to solve everyday clutter without adding more of it back into your life.</p>
+                </article>
+            </div>
+        </section>
+
+
+        <section class="pricing-band" id="collection">
+            <p class="eyebrow">The Collection</p>
+            <h2>Start with the pouch, then build a cleaner daily setup around it.</h2>
+            <p class="pricing-copy">The collection is designed for people who move between home, work, and the car and want their essentials to stay organized without looking tactical or cluttered.</p>
             <form class="signup-form">
-                <input type="email" placeholder="Email for the drop" aria-label="Email for the drop">
-                <button type="submit">Reserve My Kit</button>
+                <input type="email" placeholder="Email for product updates" aria-label="Email for product updates">
+                <button type="submit">Join The List</button>
             </form>
         </section>
     </main>
