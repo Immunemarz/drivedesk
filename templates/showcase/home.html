@@ -12,33 +12,7 @@
     <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body>
-    <div class="topbar-note">Free shipping on curated carry systems over $120</div>
-    <header class="site-header">
-        <a class="brand" href="{% url 'home' %}">
-            <span class="brand-mark">DS</span>
-            <span class="brand-text">
-                <strong>DriveDesk Supply</strong>
-                <small>Premium carry systems</small>
-            </span>
-        </a>
-        <nav class="main-nav" aria-label="Primary navigation">
-            <a href="{% url 'products' %}">Products</a>
-            <a href="#builder">System</a>
-            <a href="#about">About</a>
-            <a href="#feedback">Feedback</a>
-            <a href="#collection">Collection</a>
-        </nav>
-        <div class="header-actions">
-            <a class="cart-link" href="{% url 'cart' %}" aria-label="View cart">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 4h2l2.3 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L22 7H7.2"></path>
-                    <circle cx="10" cy="19" r="1.6"></circle>
-                    <circle cx="18" cy="19" r="1.6"></circle>
-                </svg>
-                <span class="cart-count">0</span>
-            </a>
-        </div>
-    </header>
+    {% include "showcase/partials/header.html" %}
 
     <main>
         <section class="hero">
