@@ -35,9 +35,9 @@ a {
 
 .site-header {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
     align-items: center;
-    justify-content: space-between;
     gap: 24px;
     padding: 22px clamp(20px, 5vw, 72px);
     background: rgba(26, 20, 14, 0.78);
@@ -63,6 +63,7 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 12px;
+    justify-self: start;
 }
 
 .brand-mark {
@@ -101,6 +102,8 @@ a {
 
 .main-nav {
     display: flex;
+    justify-self: center;
+    justify-content: center;
     gap: 26px;
     color: var(--muted);
     font-size: 0.92rem;
@@ -110,10 +113,63 @@ a {
     color: var(--gold);
 }
 
+.cart-count {
+    display: inline-flex;
+    min-width: 22px;
+    height: 22px;
+    margin-left: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(217, 178, 119, 0.34);
+    border-radius: 999px;
+    background: rgba(217, 178, 119, 0.12);
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.cart-link {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--steel);
+    transition: border-color 180ms ease, color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.cart-link svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cart-link .cart-count {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+}
+
+.cart-link:hover {
+    border-color: rgba(217, 178, 119, 0.5);
+    background: rgba(217, 178, 119, 0.14);
+    color: var(--gold);
+    transform: translateY(-1px);
+}
+
 .header-actions {
     display: flex;
     align-items: center;
     gap: 10px;
+    justify-self: end;
 }
 
 .nav-link-quiet {
@@ -441,6 +497,295 @@ h2 {
     line-height: 1.7;
 }
 
+.checkout-page {
+    padding: 72px clamp(20px, 5vw, 72px) 96px;
+}
+
+.checkout-shell {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.checkout-summary,
+.checkout-panel {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 24px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.checkout-image {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+
+.checkout-summary strong {
+    display: block;
+    margin-bottom: 16px;
+    color: var(--gold);
+    font-size: 2.4rem;
+}
+
+.checkout-summary p {
+    color: var(--steel);
+    line-height: 1.7;
+}
+
+.checkout-points {
+    margin: 22px 0 0;
+    padding-left: 18px;
+    color: var(--steel);
+    line-height: 1.8;
+}
+
+.checkout-payments {
+    display: grid;
+    gap: 18px;
+}
+
+.checkout-form-block {
+    margin-bottom: 22px;
+}
+
+.checkout-field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.checkout-form-block label,
+.checkout-quantity {
+    display: grid;
+    gap: 8px;
+    color: var(--steel);
+    font-weight: 600;
+}
+
+.checkout-form-block input,
+.checkout-quantity input {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ivory);
+    padding: 14px 16px;
+    font: inherit;
+}
+
+.checkout-quantity {
+    margin-top: 14px;
+    max-width: 140px;
+}
+
+.payment-box {
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.payment-copy,
+.payment-warning,
+.checkout-status {
+    color: var(--steel);
+}
+
+.payment-warning {
+    color: var(--gold);
+}
+
+.checkout-action {
+    width: 100%;
+    margin-top: 12px;
+    border: 1px solid rgba(217, 178, 119, 0.45);
+    border-radius: 999px;
+    background: var(--gold);
+    color: #10100e;
+    padding: 15px 18px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.checkout-status {
+    display: block;
+    margin-top: 12px;
+    min-height: 1.2em;
+}
+
+.status-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+}
+
+.status-card {
+    width: min(100%, 680px);
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    text-align: center;
+}
+
+.status-card p {
+    color: var(--steel);
+    line-height: 1.7;
+}
+
+.cart-page {
+    padding: 72px clamp(20px, 5vw, 72px) 96px;
+}
+
+.cart-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(290px, 0.42fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.cart-main,
+.cart-summary {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 24px;
+}
+
+.cart-items {
+    display: grid;
+    gap: 12px;
+}
+
+.cart-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.nav-link-quiet.danger {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--steel);
+    padding: 9px 14px;
+}
+
+.nav-link-quiet.danger:hover {
+    border-color: rgba(217, 178, 119, 0.4);
+    color: var(--gold);
+}
+
+.cart-item-row {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) auto;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.cart-item-row img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-item-body h2 {
+    margin: 0 0 8px;
+    font-size: 1.16rem;
+}
+
+.cart-item-body p {
+    margin: 0 0 12px;
+    color: var(--gold);
+    font-weight: 800;
+}
+
+.cart-item-row > strong {
+    color: var(--steel);
+    font-size: 1.12rem;
+    align-self: center;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cart-item-controls span {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 800;
+}
+
+.cart-item-controls button {
+    border: 1px solid rgba(217, 178, 119, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--steel);
+    padding: 7px 11px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cart-item-controls button:hover {
+    background: var(--gold);
+    color: #10100e;
+}
+
+.cart-empty {
+    color: var(--muted);
+    margin: 0;
+}
+
+.cart-summary {
+    position: sticky;
+    top: 18px;
+}
+
+.cart-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cart-line.total {
+    margin-bottom: 18px;
+}
+
+.disabled-link {
+    opacity: 0.58;
+    pointer-events: none;
+}
+
+.checkout-cart-lines {
+    margin: 10px 0 0;
+    display: grid;
+    gap: 7px;
+}
+
+.checkout-cart-lines p {
+    margin: 0;
+    color: var(--steel);
+    line-height: 1.5;
+}
+
 .about-section {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
 }
@@ -732,6 +1077,7 @@ h2 {
 
 @media (max-width: 900px) {
     .site-header {
+        display: flex;
         flex-wrap: wrap;
     }
 
@@ -758,6 +1104,24 @@ h2 {
 
     .hero-panel {
         min-height: 420px;
+    }
+
+    .checkout-shell,
+    .checkout-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-summary {
+        position: static;
+    }
+
+    .cart-actions {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .about-grid,
@@ -800,5 +1164,14 @@ h2 {
 
     .catalog-image {
         height: 190px;
+    }
+
+    .cart-item-row {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-item-row img {
+        width: 100%;
+        height: 200px;
     }
 }

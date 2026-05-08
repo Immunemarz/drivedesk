@@ -27,6 +27,14 @@
             <a href="{% url 'home' %}#collection">Collection</a>
         </nav>
         <div class="header-actions">
+            <a class="cart-link" href="{% url 'cart' %}" aria-label="View cart">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 4h2l2.3 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L22 7H7.2"></path>
+                    <circle cx="10" cy="19" r="1.6"></circle>
+                    <circle cx="18" cy="19" r="1.6"></circle>
+                </svg>
+                <span class="cart-count">0</span>
+            </a>
             <a class="nav-link-quiet" href="{% url 'home' %}#about">About</a>
             <a class="nav-cta" href="{% url 'home' %}#collection">View Collection</a>
         </div>
@@ -74,11 +82,22 @@
                         <span>{{ product.tagline }}</span>
                         <small>{{ product.details }}</small>
                     </div>
-                    <button type="button">Add To Cart</button>
+                    <button
+                        type="button"
+                        data-product-slug="{{ product.slug }}"
+                        data-product-name="{{ product.name }}"
+                        data-product-price-cents="{{ product.price_cents }}"
+                        data-product-price="{{ product.price }}"
+                        data-product-image="{{ product.image_url }}"
+                        data-checkout-url="{% url 'checkout' product.slug %}"
+                    >
+                        Add To Cart
+                    </button>
                 </article>
                 {% endfor %}
             </div>
         </section>
     </main>
+    {{ products|json_script:"catalog-data" }}
 </body>
 </html>

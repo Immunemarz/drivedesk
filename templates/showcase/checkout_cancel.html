@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Cancelled | DriveDesk Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <main class="status-page">
+        <div class="status-card">
+            <p class="eyebrow">Checkout Cancelled</p>
+            <h1>No worries, your order was not completed.</h1>
+            <p>{% if product %}You can head back and continue with {{ product.name }} whenever you're ready.{% else %}You can head back and continue shopping whenever you're ready.{% endif %}</p>
+            <a class="nav-cta" href="{% url 'products' %}">Back To Products</a>
+        </div>
+    </main>
+</body>
+</html>

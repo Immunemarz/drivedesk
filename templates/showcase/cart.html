@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | DriveDesk Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/main.js' %}" defer></script>
+</head>
+<body>
+    <div class="topbar-note">Free shipping on curated carry systems over $120</div>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">DS</span>
+            <span class="brand-text">
+                <strong>DriveDesk Supply</strong>
+                <small>Premium carry systems</small>
+            </span>
+        </a>
+        <nav class="main-nav" aria-label="Primary navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'products' %}">Products</a>
+        </nav>
+        <div class="header-actions">
+            <a class="cart-link" href="{% url 'cart' %}" aria-label="View cart">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 4h2l2.3 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L22 7H7.2"></path>
+                    <circle cx="10" cy="19" r="1.6"></circle>
+                    <circle cx="18" cy="19" r="1.6"></circle>
+                </svg>
+                <span class="cart-count">0</span>
+            </a>
+            <a class="nav-cta" href="{% url 'products' %}">Keep Shopping</a>
+        </div>
+    </header>
+
+    <main class="cart-page">
+        <section class="cart-shell">
+            <div class="cart-main">
+                <p class="eyebrow">Your Cart</p>
+                <h1>Everything in your current setup.</h1>
+                <div class="cart-actions">
+                    <a class="nav-link-quiet" href="{% url 'products' %}">Continue Shopping</a>
+                    <button id="clear-cart-button" class="nav-link-quiet danger" type="button">Clear Cart</button>
+                </div>
+                <div id="cart-items" class="cart-items"></div>
+                <p id="cart-empty" class="cart-empty">Your cart is empty right now.</p>
+                <a id="cart-empty-cta" class="nav-cta" href="{% url 'products' %}">Browse Products</a>
+            </div>
+
+            <aside class="cart-summary">
+                <p class="eyebrow">Summary</p>
+                <div class="cart-line">
+                    <span>Items</span>
+                    <strong id="cart-item-count">0</strong>
+                </div>
+                <div class="cart-line">
+                    <span>Subtotal</span>
+                    <strong id="cart-subtotal">$0.00</strong>
+                </div>
+                <div class="cart-line total">
+                    <span>Total</span>
+                    <strong id="cart-total">$0.00</strong>
+                </div>
+                <a id="cart-checkout-link" class="nav-cta disabled-link" href="{% url 'products' %}">Checkout Cart</a>
+            </aside>
+        </section>
+    </main>
+
+    {{ products|json_script:"catalog-data" }}
+</body>
+</html>

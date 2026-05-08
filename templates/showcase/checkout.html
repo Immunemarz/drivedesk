@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | DriveDesk Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% if stripe_publishable_key %}
+    <script src="https://js.stripe.com/v3/"></script>
+    {% endif %}
+    {% if paypal_client_id %}
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture"></script>
+    {% endif %}
+    <script src="{% static 'js/main.js' %}" defer></script>
+</head>
+<body>
+    <div class="topbar-note">Secure checkout for cards, Google Pay, and PayPal</div>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">DS</span>
+            <span class="brand-text">
+                <strong>DriveDesk Supply</strong>
+                <small>Premium carry systems</small>
+            </span>
+        </a>
+        <nav class="main-nav" aria-label="Primary navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'products' %}">Products</a>
+        </nav>
+        <div class="header-actions">
+            <a class="cart-link" href="{% url 'cart' %}" aria-label="View cart">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 4h2l2.3 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L22 7H7.2"></path>
+                    <circle cx="10" cy="19" r="1.6"></circle>
+                    <circle cx="18" cy="19" r="1.6"></circle>
+                </svg>
+                <span class="cart-count">0</span>
+            </a>
+            <a class="nav-cta" href="{% url 'products' %}">Back To Products</a>
+        </div>
+    </header>
+
+    <main
+        class="checkout-page"
+        {% if cart_mode %}
+        data-checkout-mode="cart"
+        {% else %}
+        data-checkout-mode="single"
+        data-product-slug="{{ product.slug }}"
+        {% endif %}
+    >
+        <section class="checkout-shell">
+            <div class="checkout-summary">
+                {% if cart_mode %}
+                <img class="checkout-image" src="https://images.pexels.com/photos/9185853/pexels-photo-9185853.jpeg?cs=srgb&dl=pexels-timur-weber-9185853.jpg&fm=jpg" alt="Cart checkout">
+                {% else %}
+                <img class="checkout-image" src="{{ product.image_url }}" alt="{{ product.name }}">
+                {% endif %}
+                <p class="eyebrow">Checkout</p>
+                {% if cart_mode %}
+                <h1>Your cart checkout</h1>
+                <strong id="checkout-cart-total">$0.00</strong>
+                <p>Review everything in your cart, then complete payment with Stripe or PayPal.</p>
+                <div id="checkout-cart-lines" class="checkout-cart-lines"></div>
+                {% else %}
+                <h1>{{ product.name }}</h1>
+                <strong>{{ product.price }}</strong>
+                <p>{{ product.details }}</p>
+                {% endif %}
+                <ul class="checkout-points">
+                    <li>Card checkout powered by Stripe</li>
+                    <li>Google Pay appears automatically when eligible and enabled in Stripe</li>
+                    <li>PayPal available as a separate checkout option</li>
+                </ul>
+            </div>
+
+            <div class="checkout-panel">
+                <div class="checkout-form-block">
+                    <p class="eyebrow">Customer Details</p>
+                    <div class="checkout-field-grid">
+                        <label>
+                            <span>Name</span>
+                            <input id="checkout-name" type="text" placeholder="Your name">
+                        </label>
+                        <label>
+                            <span>Email</span>
+                            <input id="checkout-email" type="email" placeholder="you@example.com">
+                        </label>
+                    </div>
+                    {% if not cart_mode %}
+                    <label class="checkout-quantity">
+                        <span>Quantity</span>
+                        <input id="checkout-quantity" type="number" min="1" max="5" value="1">
+                    </label>
+                    {% endif %}
+                </div>
+
+                <div class="checkout-payments">
+                    <div class="payment-box">
+                        <p class="eyebrow">Card / Google Pay</p>
+                        <p class="payment-copy">Start a secure Stripe Checkout session. Cards are always available. Google Pay appears on supported Chrome devices and browsers when enabled in Stripe.</p>
+                        {% if not stripe_publishable_key %}
+                        <p class="payment-warning">Stripe is not configured yet. Add your Stripe keys in environment variables to enable card and Google Pay checkout.</p>
+                        {% endif %}
+                        <button id="stripe-checkout-button" class="checkout-action" type="button">Pay With Card or Google Pay</button>
+                        <small id="stripe-checkout-status" class="checkout-status"></small>
+                    </div>
+
+                    <div class="payment-box">
+                        <p class="eyebrow">PayPal</p>
+                        <p class="payment-copy">Checkout with PayPal using the official PayPal button below.</p>
+                        {% if not paypal_client_id %}
+                        <p class="payment-warning">PayPal is not configured yet. Add your PayPal client id and secret in environment variables to enable the button.</p>
+                        {% endif %}
+                        <div id="paypal-button-container"></div>
+                        <small id="paypal-status" class="checkout-status"></small>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

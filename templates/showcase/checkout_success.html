@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | DriveDesk Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <main class="status-page">
+        <div class="status-card">
+            <p class="eyebrow">Thank You</p>
+            <h1>Your order was received.</h1>
+            <p>We also sent an internal notification email to `temp@gmail.com` for this purchase flow.</p>
+            <a class="nav-cta" href="{% url 'products' %}">Continue Shopping</a>
+        </div>
+    </main>
+</body>
+</html>
