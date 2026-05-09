@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,9 +22,41 @@ def load_env_file():
 
 load_env_file()
 
+
+def csv_env(name, default=""):
+    return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+
+
+def normalize_allowed_host(value):
+    host = value.strip()
+    if "://" in host:
+        host = urlsplit(host).netloc
+    return host.split("/")[0]
+
+
+def normalize_csrf_origin(value):
+    origin = value.strip().rstrip("/")
+    if not origin:
+        return ""
+    if "://" not in origin:
+        origin = f"https://{origin}"
+    parsed = urlsplit(origin)
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,drivedesk.onrender.com").split(",") if host.strip()]
+ALLOWED_HOSTS = [
+    host
+    for host in (normalize_allowed_host(item) for item in csv_env("ALLOWED_HOSTS", "127.0.0.1,localhost,drivedesk.onrender.com"))
+    if host
+]
+CSRF_TRUSTED_ORIGINS = [
+    origin
+    for origin in (normalize_csrf_origin(item) for item in csv_env("CSRF_TRUSTED_ORIGINS", "https://drivedesk.onrender.com"))
+    if origin
+]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
