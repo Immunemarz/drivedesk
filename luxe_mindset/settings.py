@@ -23,7 +23,7 @@ load_env_file()
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()]
+ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,drivedesk.onrender.com").split(",") if host.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
