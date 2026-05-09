@@ -49,7 +49,7 @@
             <div class="catalog-grid">
                 {% for product in products %}
                 <article class="catalog-card" data-category="{{ product.category }}">
-                    <img class="catalog-image" src="{{ product.image_url }}" alt="{{ product.name }}">
+                    <img class="catalog-image" src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
                     <div class="catalog-card-body">
                         <p>{{ product.category }}</p>
                         <h2>{{ product.name }}</h2>

@@ -1,5 +1,10 @@
 .venv/
+.env
+.env.example
 db.sqlite3
 __pycache__/
+staticfiles/
 *.py[cod]
 .DS_Store
+.vscode/
+README.md
