@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.http import Http404, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 
@@ -161,6 +162,7 @@ def paypal_access_token():
     return response.json()["access_token"]
 
 
+@ensure_csrf_cookie
 def home(request):
     featured_products = [
         {
@@ -188,6 +190,7 @@ def cart(request):
     return render(request, "showcase/cart.html", {"products": PRODUCTS})
 
 
+@ensure_csrf_cookie
 def checkout(request, slug):
     product = get_product_or_404(slug)
     return render(
@@ -201,6 +204,7 @@ def checkout(request, slug):
     )
 
 
+@ensure_csrf_cookie
 def checkout_cart(request):
     return render(
         request,
@@ -236,6 +240,29 @@ def join_updates(request):
         [
             f"Email: {email}",
             "Source: homepage collection form",
+        ],
+    )
+    return JsonResponse({"ok": True})
+
+
+@require_POST
+def send_feedback(request):
+    payload = json.loads(request.body or "{}")
+    name = (payload.get("name") or "").strip()
+    email = (payload.get("email") or "").strip()
+    message = (payload.get("message") or "").strip()
+
+    if not name or not email or not message:
+        return JsonResponse({"error": "Name, email, and feedback are required."}, status=400)
+
+    notify_temp_gmail(
+        "DriveDesk customer feedback",
+        [
+            f"Name: {name}",
+            f"Email: {email}",
+            "",
+            "Feedback:",
+            message,
         ],
     )
     return JsonResponse({"ok": True})

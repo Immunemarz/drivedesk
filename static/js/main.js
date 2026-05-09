@@ -1,6 +1,7 @@
 const workflowButtons = document.querySelectorAll(".workflow-step");
 const workflowOutput = document.querySelector("#workflow-output");
 const signupForm = document.querySelector(".signup-form");
+const feedbackForm = document.querySelector(".feedback-form");
 const tabButtons = document.querySelectorAll(".tab-button");
 const catalogCards = document.querySelectorAll(".catalog-card");
 const productButtons = document.querySelectorAll(".catalog-card button");
@@ -240,6 +241,46 @@ if (signupForm) {
             .catch(() => {
                 button.disabled = false;
                 button.textContent = "Join The List";
+            });
+    });
+}
+
+if (feedbackForm) {
+    feedbackForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const button = feedbackForm.querySelector("button");
+        const status = feedbackForm.querySelector(".feedback-status");
+        const formData = new FormData(feedbackForm);
+        const payload = {
+            name: String(formData.get("name") || "").trim(),
+            email: String(formData.get("email") || "").trim(),
+            message: String(formData.get("message") || "").trim(),
+        };
+
+        if (!payload.name || !payload.email || !payload.message) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Sending...";
+        if (status) {
+            status.textContent = "";
+        }
+
+        postJson("/api/send-feedback/", payload)
+            .then(() => {
+                feedbackForm.reset();
+                button.textContent = "Sent";
+                if (status) {
+                    status.textContent = "Thanks. Your feedback was sent.";
+                }
+            })
+            .catch((error) => {
+                button.disabled = false;
+                button.textContent = "Send Feedback";
+                if (status) {
+                    status.textContent = error.message;
+                }
             });
     });
 }

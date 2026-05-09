@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="icon" href="{% static 'images/drivedesk-logo.svg' %}" type="image/svg+xml">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="{% static 'js/main.js' %}" defer></script>
 </head>
@@ -104,6 +105,37 @@
                     <p>Everything in the line exists to solve everyday clutter without adding more of it back into your life.</p>
                 </article>
             </div>
+        </section>
+
+        <section class="feedback-section" id="feedback">
+            <div class="section-heading">
+                <p class="eyebrow">Company Feedback</p>
+                <h2>Tell us what would make DriveDesk Supply better.</h2>
+                <p class="feedback-copy">
+                    Send product ideas, site issues, order questions, or anything you want us to improve.
+                    Your message goes straight to the DriveDesk inbox.
+                </p>
+            </div>
+            <form class="feedback-form">
+                <div class="feedback-fields">
+                    <label>
+                        Name
+                        <input type="text" name="name" placeholder="Your name" autocomplete="name" required>
+                    </label>
+                    <label>
+                        Email
+                        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+                    </label>
+                </div>
+                <label>
+                    Feedback
+                    <textarea name="message" rows="5" placeholder="What should we improve, add, or fix?" required></textarea>
+                </label>
+                <div class="feedback-submit-row">
+                    <button type="submit">Send Feedback</button>
+                    <span class="feedback-status" aria-live="polite"></span>
+                </div>
+            </form>
         </section>
 
 

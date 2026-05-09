@@ -1,0 +1,12 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">DriveDesk Supply logo</title>
+  <desc id="desc">A premium monogram mark combining a D, an S curve, and organized carry lines.</desc>
+  <rect x="10" y="10" width="76" height="76" rx="22" fill="#1B1510"/>
+  <rect x="10.75" y="10.75" width="74.5" height="74.5" rx="21.25" stroke="#D9B277" stroke-opacity="0.72" stroke-width="1.5"/>
+  <path d="M30 25H48C61.255 25 72 35.745 72 49C72 62.255 61.255 73 48 73H30V25Z" stroke="#F7E7CA" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M47 31C59.5 31 65 38.4 65 47.8C65 58.2 57.15 65 46.8 65H40V53H47.7C53.25 53 57 50.75 57 46.9C57 43 53.35 40.9 47.5 40.9H40V31H47Z" fill="#D9B277"/>
+  <path d="M25 31H41" stroke="#8CA295" stroke-width="4" stroke-linecap="round"/>
+  <path d="M25 48H51" stroke="#8CA295" stroke-width="4" stroke-linecap="round"/>
+  <path d="M25 65H41" stroke="#8CA295" stroke-width="4" stroke-linecap="round"/>
+  <path d="M63 24C72.5 30 78 38.2 78 48.2C78 58.1 72.45 66.7 63 72" stroke="#D9B277" stroke-width="2.8" stroke-linecap="round"/>
+</svg>
