@@ -941,7 +941,7 @@ h2 {
 }
 
 .catalog-section {
-    padding: 42px clamp(20px, 5vw, 72px) 96px;
+    padding: 56px clamp(20px, 5vw, 72px) 96px;
     background: #f5ede3;
     color: #1c1611;
 }
