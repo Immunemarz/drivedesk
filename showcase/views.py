@@ -77,8 +77,8 @@ PRODUCTS = [
         "name": "Seat-Gap Organizer",
         "slug": "seat-gap-organizer",
         "category": "Car",
-        "price": "$2.90",
-        "price_cents": 290,
+        "price": "$0.10",
+        "price_cents": 10,
         "tagline": "A simple fix for keys, cards, receipts, and cables.",
         "details": "Slim organizer with card sleeve, cable notch, and soft-touch interior.",
         "image_url": "https://images.pexels.com/photos/6969025/pexels-photo-6969025.jpeg?cs=srgb&dl=pexels-lynxexotics-6969025.jpg&fm=jpg",
@@ -348,8 +348,8 @@ def create_stripe_checkout_session(request):
                 "customer_name": customer_name,
                 "customer_email": customer_email,
             },
-            success_url=f"{settings.SITE_URL}{reverse('checkout_success')}?provider=stripe",
-            cancel_url=f"{settings.SITE_URL}{reverse('checkout_cancel')}",
+            success_url=request.build_absolute_uri(f"{reverse('checkout_success')}?provider=stripe"),
+            cancel_url=request.build_absolute_uri(reverse("checkout_cancel")),
         )
     except stripe.error.StripeError as error:
         return JsonResponse({"error": str(error)}, status=400)
