@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
+from .models import TransactionLog
+
 
 PRODUCTS = [
     {
@@ -135,6 +137,23 @@ def parse_cart_items(payload):
     return normalized
 
 
+def transaction_items(cart_items):
+    return [
+        {
+            "name": product["name"],
+            "slug": product["slug"],
+            "quantity": quantity,
+            "unit_amount_cents": product["price_cents"],
+            "line_amount_cents": product["price_cents"] * quantity,
+        }
+        for product, quantity in cart_items
+    ]
+
+
+def transaction_total_cents(cart_items):
+    return sum(product["price_cents"] * quantity for product, quantity in cart_items)
+
+
 def stripe_is_configured():
     return bool(settings.STRIPE_PUBLISHABLE_KEY and settings.STRIPE_SECRET_KEY)
 
@@ -236,6 +255,12 @@ def checkout_cart(request):
 
 
 def checkout_success(request):
+    if request.GET.get("provider") == "stripe" and request.GET.get("session_id"):
+        session_id = request.GET["session_id"]
+        TransactionLog.objects.filter(
+            provider=TransactionLog.PROVIDER_STRIPE,
+            external_id=session_id,
+        ).update(status=TransactionLog.STATUS_PAID)
     return render(request, "showcase/checkout_success.html")
 
 
@@ -296,30 +321,18 @@ def create_stripe_checkout_session(request):
     customer_email = (payload.get("customer_email") or "").strip()
 
     cart_items = parse_cart_items(payload)
+    if not cart_items:
+        slug = payload.get("slug", "")
+        if not slug:
+            return JsonResponse({"error": "Your cart is empty."}, status=400)
+        quantity = parse_quantity(payload.get("quantity", 1))
+        product = get_product_or_404(slug)
+        cart_items = [(product, quantity)]
+
     line_items = []
     summary_lines = []
 
-    if cart_items:
-        for product, quantity in cart_items:
-            line_items.append(
-                {
-                    "price_data": {
-                        "currency": "usd",
-                        "unit_amount": product["price_cents"],
-                        "product_data": {
-                            "name": product["name"],
-                            "description": product["details"],
-                            "images": [product["image_url"]],
-                        },
-                    },
-                    "quantity": quantity,
-                }
-            )
-            summary_lines.append(f"{product['name']} x {quantity}")
-    else:
-        slug = payload.get("slug", "")
-        quantity = parse_quantity(payload.get("quantity", 1))
-        product = get_product_or_404(slug)
+    for product, quantity in cart_items:
         line_items.append(
             {
                 "price_data": {
@@ -348,11 +361,33 @@ def create_stripe_checkout_session(request):
                 "customer_name": customer_name,
                 "customer_email": customer_email,
             },
-            success_url=request.build_absolute_uri(f"{reverse('checkout_success')}?provider=stripe"),
+            success_url=request.build_absolute_uri(f"{reverse('checkout_success')}?provider=stripe&session_id={{CHECKOUT_SESSION_ID}}"),
             cancel_url=request.build_absolute_uri(reverse("checkout_cancel")),
         )
     except stripe.error.StripeError as error:
+        TransactionLog.objects.create(
+            provider=TransactionLog.PROVIDER_STRIPE,
+            status=TransactionLog.STATUS_FAILED,
+            customer_name=customer_name,
+            customer_email=customer_email,
+            items=transaction_items(cart_items),
+            amount_cents=transaction_total_cents(cart_items),
+            currency="usd",
+            notes=str(error),
+        )
         return JsonResponse({"error": str(error)}, status=400)
+
+    TransactionLog.objects.create(
+        provider=TransactionLog.PROVIDER_STRIPE,
+        status=TransactionLog.STATUS_STARTED,
+        external_id=session.id,
+        customer_name=customer_name,
+        customer_email=customer_email,
+        items=transaction_items(cart_items),
+        amount_cents=transaction_total_cents(cart_items),
+        currency="usd",
+        notes="Stripe Checkout session created.",
+    )
 
     notify_temp_gmail(
         "Stripe checkout started",
@@ -376,35 +411,27 @@ def create_paypal_order(request):
     customer_name = (payload.get("customer_name") or "").strip()
     customer_email = (payload.get("customer_email") or "").strip()
     cart_items = parse_cart_items(payload)
+    if not cart_items:
+        slug = payload.get("slug", "")
+        if not slug:
+            return JsonResponse({"error": "Your cart is empty."}, status=400)
+        quantity = parse_quantity(payload.get("quantity", 1))
+        product = get_product_or_404(slug)
+        cart_items = [(product, quantity)]
 
     purchase_units = []
     summary_lines = []
 
-    if cart_items:
-        total_cents = 0
-        for product, quantity in cart_items:
-            total_cents += product["price_cents"] * quantity
-            summary_lines.append(f"{product['name']} x {quantity}")
-        purchase_units.append(
-            {
-                "description": "DriveDesk cart checkout",
-                "amount": {"currency_code": "USD", "value": f"{total_cents / 100:.2f}"},
-                "custom_id": "cart-checkout",
-            }
-        )
-    else:
-        slug = payload.get("slug", "")
-        quantity = parse_quantity(payload.get("quantity", 1))
-        product = get_product_or_404(slug)
-        total = f"{(product['price_cents'] * quantity) / 100:.2f}"
+    total_cents = transaction_total_cents(cart_items)
+    for product, quantity in cart_items:
         summary_lines.append(f"{product['name']} x {quantity}")
-        purchase_units.append(
-            {
-                "description": product["name"],
-                "amount": {"currency_code": "USD", "value": total},
-                "custom_id": product["slug"],
-            }
-        )
+    purchase_units.append(
+        {
+            "description": "DriveDesk cart checkout" if len(cart_items) > 1 else cart_items[0][0]["name"],
+            "amount": {"currency_code": "USD", "value": f"{total_cents / 100:.2f}"},
+            "custom_id": "cart-checkout" if len(cart_items) > 1 else cart_items[0][0]["slug"],
+        }
+    )
 
     access_token = paypal_access_token()
     response = requests.post(
@@ -432,7 +459,20 @@ def create_paypal_order(request):
         ],
     )
 
-    return JsonResponse({"order_id": response.json()["id"]})
+    order_id = response.json()["id"]
+    TransactionLog.objects.create(
+        provider=TransactionLog.PROVIDER_PAYPAL,
+        status=TransactionLog.STATUS_STARTED,
+        external_id=order_id,
+        customer_name=customer_name,
+        customer_email=customer_email,
+        items=transaction_items(cart_items),
+        amount_cents=total_cents,
+        currency="usd",
+        notes="PayPal order created.",
+    )
+
+    return JsonResponse({"order_id": order_id})
 
 
 @require_POST
@@ -449,6 +489,8 @@ def capture_paypal_order(request):
         summary_lines = [f"{product['name']} x {quantity}" for product, quantity in cart_items]
     else:
         slug = payload.get("slug", "")
+        if not slug:
+            return JsonResponse({"error": "Your cart is empty."}, status=400)
         quantity = parse_quantity(payload.get("quantity", 1))
         product = get_product_or_404(slug)
         summary_lines = [f"{product['name']} x {quantity}"]
@@ -463,6 +505,16 @@ def capture_paypal_order(request):
         timeout=20,
     )
     response.raise_for_status()
+
+    TransactionLog.objects.filter(
+        provider=TransactionLog.PROVIDER_PAYPAL,
+        external_id=order_id,
+    ).update(
+        status=TransactionLog.STATUS_PAID,
+        customer_name=customer_name,
+        customer_email=customer_email,
+        notes="PayPal order captured.",
+    )
 
     notify_temp_gmail(
         "PayPal order captured",
