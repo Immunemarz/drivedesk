@@ -58,6 +58,8 @@ PAYPAL_CLIENT_SECRET=
 PAYPAL_API_BASE=https://api-m.paypal.com
 ```
 
+For live PayPal checkout, the client id and secret must come from the same PayPal REST app in Live mode. Sandbox credentials only work with `https://api-m.sandbox.paypal.com`; live credentials only work with `https://api-m.paypal.com`.
+
 Use `.env.example` as the template and keep `.env` local.
 
 For live Stripe checkout, use:

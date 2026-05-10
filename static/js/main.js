@@ -348,7 +348,7 @@ if (window.paypal && checkoutPage) {
             if (checkoutPage.dataset.checkoutMode === "cart" && readCart().length === 0) {
                 throw new Error("Your cart is empty.");
             }
-            paypalStatus.textContent = "Preparing PayPal checkout...";
+            
             const data = await postJson("/api/paypal/create-order/", checkoutPayload());
             return data.order_id;
         },
@@ -364,7 +364,7 @@ if (window.paypal && checkoutPage) {
             window.location.href = result.redirect_url;
         },
         onError(error) {
-            paypalStatus.textContent = error?.message || "PayPal checkout could not be started. Check your PayPal keys.";
+            paypalStatus.textContent = error?.message || "PayPal checkout could not be started.";
         },
     }).render("#paypal-button-container");
 }

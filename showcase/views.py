@@ -204,7 +204,13 @@ def paypal_error_message(error):
         details = response.json()
     except ValueError:
         return response.text or str(error)
-    return details.get("message") or details.get("name") or str(details)
+    return (
+        details.get("error_description")
+        or details.get("message")
+        or details.get("name")
+        or details.get("error")
+        or str(details)
+    )
 
 
 @ensure_csrf_cookie
