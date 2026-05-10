@@ -320,6 +320,10 @@ productButtons.forEach((button) => {
 
 if (stripeCheckoutButton && checkoutPage) {
     stripeCheckoutButton.addEventListener("click", async () => {
+        if (stripeCheckoutButton.disabled) {
+            stripeCheckoutStatus.textContent = "Stripe needs both API keys before checkout can start.";
+            return;
+        }
         if (checkoutPage.dataset.checkoutMode === "cart" && readCart().length === 0) {
             stripeCheckoutStatus.textContent = "Your cart is empty.";
             return;

@@ -135,6 +135,10 @@ def parse_cart_items(payload):
     return normalized
 
 
+def stripe_is_configured():
+    return bool(settings.STRIPE_PUBLISHABLE_KEY and settings.STRIPE_SECRET_KEY)
+
+
 def notify_temp_gmail(subject, lines):
     body = "\n".join(lines)
     send_mail(
@@ -199,6 +203,7 @@ def checkout(request, slug):
         {
             "product": product,
             "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
+            "stripe_configured": stripe_is_configured(),
             "paypal_client_id": settings.PAYPAL_CLIENT_ID,
         },
     )
@@ -212,6 +217,7 @@ def checkout_cart(request):
         {
             "product": None,
             "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
+            "stripe_configured": stripe_is_configured(),
             "paypal_client_id": settings.PAYPAL_CLIENT_ID,
             "cart_mode": True,
         },
@@ -270,8 +276,8 @@ def send_feedback(request):
 
 @require_POST
 def create_stripe_checkout_session(request):
-    if not settings.STRIPE_SECRET_KEY:
-        return JsonResponse({"error": "Stripe is not configured."}, status=400)
+    if not stripe_is_configured():
+        return JsonResponse({"error": "Stripe is not configured. Add both Stripe keys."}, status=400)
 
     payload = json.loads(request.body or "{}")
     customer_name = (payload.get("customer_name") or "").strip()
@@ -318,6 +324,24 @@ def create_stripe_checkout_session(request):
         )
         summary_lines.append(f"{product['name']} x {quantity}")
 
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        session = stripe.checkout.Session.create(
+            mode="payment",
+            line_items=line_items,
+            customer_email=customer_email or None,
+            automatic_payment_methods={"enabled": True},
+            metadata={
+                "items": " | ".join(summary_lines),
+                "customer_name": customer_name,
+                "customer_email": customer_email,
+            },
+            success_url=f"{settings.SITE_URL}{reverse('checkout_success')}?provider=stripe",
+            cancel_url=f"{settings.SITE_URL}{reverse('checkout_cancel')}",
+        )
+    except stripe.error.StripeError as error:
+        return JsonResponse({"error": str(error)}, status=400)
+
     notify_temp_gmail(
         "Stripe checkout started",
         [
@@ -328,19 +352,6 @@ def create_stripe_checkout_session(request):
         ],
     )
 
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    session = stripe.checkout.Session.create(
-        mode="payment",
-        line_items=line_items,
-        customer_email=customer_email or None,
-        metadata={
-            "items": " | ".join(summary_lines),
-            "customer_name": customer_name,
-            "customer_email": customer_email,
-        },
-        success_url=f"{settings.SITE_URL}{reverse('checkout_success')}?provider=stripe",
-        cancel_url=f"{settings.SITE_URL}{reverse('checkout_cancel')}",
-    )
     return JsonResponse({"checkout_url": session.url})
 
 

@@ -58,6 +58,15 @@ PAYPAL_CLIENT_SECRET=
 
 Use `.env.example` as the template and keep `.env` local.
 
+For live Stripe checkout, use:
+
+```text
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+```
+
+The publishable key can be visible in browser-side Stripe setup, but the secret key must only live in `.env` locally or in Render environment variables.
+
 On Windows PowerShell, if your virtual environment uses `Scripts` instead of `bin`, run:
 
 ```powershell
