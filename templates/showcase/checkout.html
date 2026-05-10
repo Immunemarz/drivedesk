@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="icon" href="{% static 'images/drivedesk-logo.svg' %}" type="image/svg+xml">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    {% if stripe_configured %}
+    
     <script src="https://js.stripe.com/v3/"></script>
-    {% endif %}
+    
     {% if paypal_client_id %}
     <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture"></script>
     {% endif %}
@@ -76,9 +76,7 @@
                     <div class="payment-box">
                         <p class="eyebrow">Card / Google Pay</p>
                         <p class="payment-copy">Start a secure Stripe Checkout session. Cards are always available. Google Pay appears on supported Chrome devices and browsers when enabled in Stripe.</p>
-                        {% if not stripe_configured %}
-                        <p class="payment-warning">Stripe is not configured yet. Add both STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in environment variables to enable card and Google Pay checkout.</p>
-                        {% endif %}
+
                         <button id="stripe-checkout-button" class="checkout-action" type="button" {% if not stripe_configured %}disabled{% endif %}>Pay With Card or Google Pay</button>
                         <small id="stripe-checkout-status" class="checkout-status"></small>
                     </div>
