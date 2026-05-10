@@ -761,6 +761,71 @@ h2 {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.cart-summary .coupon-form {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0 0;
+    padding: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(217, 178, 119, 0.18);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cart-summary .coupon-form label {
+    color: var(--steel);
+    font-size: 0.92rem;
+    font-weight: 800;
+}
+
+.cart-summary .coupon-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.cart-summary .coupon-row input {
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--cream);
+    padding: 11px 12px;
+    font: inherit;
+}
+
+.cart-summary .coupon-row button,
+.cart-summary .coupon-remove {
+    border: 1px solid rgba(217, 178, 119, 0.35);
+    border-radius: 999px;
+    background: rgba(217, 178, 119, 0.12);
+    color: var(--cream);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 800;
+    padding: 10px 13px;
+}
+
+.cart-summary .coupon-row button:hover,
+.cart-summary .coupon-remove:hover {
+    background: var(--gold);
+    color: #10100e;
+}
+
+.cart-summary .coupon-remove {
+    justify-self: start;
+    padding: 8px 12px;
+}
+
+.cart-summary .coupon-status {
+    min-height: 1.2em;
+    color: var(--steel);
+}
+
+.cart-summary #cart-discount {
+    color: #9bd8b6;
+}
+
 .cart-line.total {
     margin-bottom: 18px;
 }
@@ -1189,6 +1254,10 @@ h2 {
 
     .cart-summary {
         position: static;
+    }
+
+    .coupon-row {
+        grid-template-columns: 1fr;
     }
 
     .cart-actions {

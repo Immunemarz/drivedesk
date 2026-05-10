@@ -20,8 +20,15 @@ const cartCheckoutLink = document.querySelector("#cart-checkout-link");
 const clearCartButton = document.querySelector("#clear-cart-button");
 const checkoutCartTotal = document.querySelector("#checkout-cart-total");
 const checkoutCartLines = document.querySelector("#checkout-cart-lines");
+const couponForm = document.querySelector(".coupon-form");
+const couponCodeInput = document.querySelector("#coupon-code");
+const couponStatus = document.querySelector("#coupon-status");
+const removeCouponButton = document.querySelector("#remove-coupon-button");
+const cartDiscountLine = document.querySelector("#cart-discount-line");
+const cartDiscount = document.querySelector("#cart-discount");
 
 const CART_STORAGE_KEY = "drivedesk_cart";
+const COUPON_STORAGE_KEY = "drivedesk_coupon";
 const catalogDataElement = document.querySelector("#catalog-data");
 const catalogData = catalogDataElement ? JSON.parse(catalogDataElement.textContent) : [];
 
@@ -73,12 +80,35 @@ function writeCart(items) {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
 }
 
+function readCoupon() {
+    try {
+        return JSON.parse(localStorage.getItem(COUPON_STORAGE_KEY) || "null");
+    } catch {
+        return null;
+    }
+}
+
+function writeCoupon(coupon) {
+    if (coupon) {
+        localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(coupon));
+    } else {
+        localStorage.removeItem(COUPON_STORAGE_KEY);
+    }
+}
+
 function cartItemCountTotal(cart) {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
 }
 
 function cartSubtotalCents(cart) {
     return cart.reduce((sum, item) => sum + item.price_cents * item.quantity, 0);
+}
+
+function couponDiscountCents(subtotalCents, coupon) {
+    if (!coupon || !coupon.percent_off) {
+        return 0;
+    }
+    return Math.min(subtotalCents, Math.round((subtotalCents * coupon.percent_off) / 100));
 }
 
 function renderCartCount() {
@@ -103,8 +133,10 @@ function addProductToCart(payload) {
 
 function clearCart() {
     writeCart([]);
+    writeCoupon(null);
     renderCartCount();
     renderCartPage();
+    renderCheckoutCartSummary();
 }
 
 function updateCartQuantity(slug, nextQuantity) {
@@ -130,6 +162,9 @@ function renderCartPage() {
     const cart = readCart();
     const itemCount = cartItemCountTotal(cart);
     const subtotalCents = cartSubtotalCents(cart);
+    let coupon = readCoupon();
+    const discountCents = couponDiscountCents(subtotalCents, coupon);
+    const totalCents = Math.max(0, subtotalCents - discountCents);
 
     cartItemsContainer.innerHTML = "";
     if (cartEmpty) {
@@ -161,7 +196,30 @@ function renderCartPage() {
 
     cartItemCount.textContent = String(itemCount);
     cartSubtotal.textContent = formatCurrencyFromCents(subtotalCents);
-    cartTotal.textContent = formatCurrencyFromCents(subtotalCents);
+    cartTotal.textContent = formatCurrencyFromCents(totalCents);
+
+    if (subtotalCents === 0 && coupon) {
+        writeCoupon(null);
+        coupon = null;
+    }
+
+    if (cartDiscountLine && cartDiscount) {
+        const shouldShowDiscount = Boolean(coupon && discountCents > 0);
+        cartDiscountLine.hidden = !shouldShowDiscount;
+        cartDiscount.textContent = `-${formatCurrencyFromCents(discountCents)}`;
+    }
+
+    if (couponCodeInput && coupon) {
+        couponCodeInput.value = coupon.code;
+    }
+
+    if (removeCouponButton) {
+        removeCouponButton.hidden = !coupon;
+    }
+
+    if (couponStatus) {
+        couponStatus.textContent = coupon ? `${coupon.code} applied: ${coupon.percent_off}% off.` : "";
+    }
 
     if (cart.length > 0) {
         cartCheckoutLink.classList.remove("disabled-link");
@@ -187,7 +245,7 @@ function checkoutPayload() {
             slug: item.slug,
             quantity: item.quantity,
         }));
-        return { ...basePayload, cart_items: cartItems };
+        return { ...basePayload, cart_items: cartItems, coupon_code: readCoupon()?.code || "" };
     }
 
     return {
@@ -204,7 +262,10 @@ function renderCheckoutCartSummary() {
 
     const cart = readCart();
     const subtotal = cartSubtotalCents(cart);
-    checkoutCartTotal.textContent = formatCurrencyFromCents(subtotal);
+    const coupon = readCoupon();
+    const discount = couponDiscountCents(subtotal, coupon);
+    const total = Math.max(0, subtotal - discount);
+    checkoutCartTotal.textContent = formatCurrencyFromCents(total);
     checkoutCartLines.innerHTML = "";
 
     if (cart.length === 0) {
@@ -217,6 +278,11 @@ function renderCheckoutCartSummary() {
         line.textContent = `${item.name} x ${item.quantity} — ${formatCurrencyFromCents(item.price_cents * item.quantity)}`;
         checkoutCartLines.appendChild(line);
     });
+    if (coupon && discount > 0) {
+        const line = document.createElement("p");
+        line.textContent = `${coupon.code} discount - ${formatCurrencyFromCents(discount)}`;
+        checkoutCartLines.appendChild(line);
+    }
 }
 
 workflowButtons.forEach((button) => {
@@ -322,6 +388,66 @@ productButtons.forEach((button) => {
         }, 850);
     });
 });
+
+if (couponForm) {
+    couponForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const code = couponCodeInput?.value?.trim() || "";
+        const subtotalCents = cartSubtotalCents(readCart());
+        const button = couponForm.querySelector("button[type='submit']");
+
+        if (!code || subtotalCents <= 0) {
+            if (couponStatus) {
+                couponStatus.textContent = subtotalCents <= 0 ? "Add an item before using a coupon." : "Enter a coupon code.";
+            }
+            return;
+        }
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Applying...";
+        }
+        if (couponStatus) {
+            couponStatus.textContent = "";
+        }
+
+        try {
+            const coupon = await postJson("/api/coupons/validate/", {
+                code,
+                subtotal_cents: subtotalCents,
+            });
+            writeCoupon(coupon);
+            renderCartPage();
+            renderCheckoutCartSummary();
+        } catch (error) {
+            writeCoupon(null);
+            renderCartPage();
+            renderCheckoutCartSummary();
+            if (couponStatus) {
+                couponStatus.textContent = "Coupon is not valid.";
+            }
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.textContent = "Apply";
+            }
+        }
+    });
+}
+
+if (removeCouponButton) {
+    removeCouponButton.addEventListener("click", () => {
+        writeCoupon(null);
+        if (couponCodeInput) {
+            couponCodeInput.value = "";
+        }
+        if (couponStatus) {
+            couponStatus.textContent = "";
+        }
+        renderCartPage();
+        renderCheckoutCartSummary();
+    });
+}
 
 if (stripeCheckoutButton && checkoutPage) {
     stripeCheckoutButton.addEventListener("click", async () => {

@@ -27,3 +27,16 @@ class TransactionLog(models.Model):
     def __str__(self):
         label = self.external_id or f"transaction-{self.pk}"
         return f"{self.provider} {self.status} {label}"
+
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=40, unique=True)
+    percent_off = models.PositiveSmallIntegerField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} ({self.percent_off}% off)"

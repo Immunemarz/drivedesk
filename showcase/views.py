@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
-from .models import TransactionLog
+from .models import Coupon, TransactionLog
 
 
 PRODUCTS = [
@@ -152,6 +152,31 @@ def transaction_items(cart_items):
 
 def transaction_total_cents(cart_items):
     return sum(product["price_cents"] * quantity for product, quantity in cart_items)
+
+
+def normalize_coupon_code(raw_code):
+    return (raw_code or "").strip().upper()
+
+
+def get_active_coupon(raw_code):
+    code = normalize_coupon_code(raw_code)
+    if not code:
+        return None
+    return Coupon.objects.filter(code=code, is_active=True).first()
+
+
+def discount_cents_for_coupon(subtotal_cents, coupon):
+    if not coupon:
+        return 0
+    return min(subtotal_cents, round(subtotal_cents * coupon.percent_off / 100))
+
+
+def checkout_amounts(cart_items, raw_coupon_code=""):
+    subtotal_cents = transaction_total_cents(cart_items)
+    coupon = get_active_coupon(raw_coupon_code)
+    discount_cents = discount_cents_for_coupon(subtotal_cents, coupon)
+    total_cents = max(0, subtotal_cents - discount_cents)
+    return subtotal_cents, discount_cents, total_cents, coupon
 
 
 def stripe_is_configured():
@@ -328,6 +353,25 @@ def send_feedback(request):
 
 
 @require_POST
+def validate_coupon(request):
+    payload = json.loads(request.body or "{}")
+    subtotal_cents = max(0, int(payload.get("subtotal_cents") or 0))
+    coupon = get_active_coupon(payload.get("code"))
+    if not coupon:
+        return JsonResponse({"error": "Coupon code was not found."}, status=404)
+
+    discount_cents = discount_cents_for_coupon(subtotal_cents, coupon)
+    return JsonResponse(
+        {
+            "code": coupon.code,
+            "percent_off": coupon.percent_off,
+            "discount_cents": discount_cents,
+            "total_cents": max(0, subtotal_cents - discount_cents),
+        }
+    )
+
+
+@require_POST
 def create_stripe_checkout_session(request):
     configuration_error = stripe_configuration_error()
     if configuration_error:
@@ -336,6 +380,7 @@ def create_stripe_checkout_session(request):
     payload = json.loads(request.body or "{}")
     customer_name = (payload.get("customer_name") or "").strip()
     customer_email = (payload.get("customer_email") or "").strip()
+    coupon_code = normalize_coupon_code(payload.get("coupon_code"))
 
     cart_items = parse_cart_items(payload)
     if not cart_items:
@@ -348,22 +393,42 @@ def create_stripe_checkout_session(request):
 
     line_items = []
     summary_lines = []
+    subtotal_cents, discount_cents, total_cents, coupon = checkout_amounts(cart_items, coupon_code)
+    if coupon_code and not coupon:
+        return JsonResponse({"error": "Coupon code was not found."}, status=400)
 
-    for product, quantity in cart_items:
+    if coupon:
         line_items.append(
             {
                 "price_data": {
                     "currency": "usd",
-                    "unit_amount": product["price_cents"],
+                    "unit_amount": total_cents,
                     "product_data": {
-                        "name": product["name"],
-                        "description": product["details"],
-                        "images": [product["image_url"]],
+                        "name": "DriveDesk discounted order",
+                        "description": f"{coupon.code} applied for {coupon.percent_off}% off.",
                     },
                 },
-                "quantity": quantity,
+                "quantity": 1,
             }
         )
+    else:
+        for product, quantity in cart_items:
+            line_items.append(
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "unit_amount": product["price_cents"],
+                        "product_data": {
+                            "name": product["name"],
+                            "description": product["details"],
+                            "images": [product["image_url"]],
+                        },
+                    },
+                    "quantity": quantity,
+                }
+            )
+
+    for product, quantity in cart_items:
         summary_lines.append(f"{product['name']} x {quantity}")
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -377,6 +442,8 @@ def create_stripe_checkout_session(request):
                 "items": " | ".join(summary_lines),
                 "customer_name": customer_name,
                 "customer_email": customer_email,
+                "coupon_code": coupon.code if coupon else "",
+                "discount_cents": str(discount_cents),
             },
             success_url=request.build_absolute_uri(f"{reverse('checkout_success')}?provider=stripe&session_id={{CHECKOUT_SESSION_ID}}"),
             cancel_url=request.build_absolute_uri(reverse("checkout_cancel")),
@@ -388,7 +455,7 @@ def create_stripe_checkout_session(request):
             customer_name=customer_name,
             customer_email=customer_email,
             items=transaction_items(cart_items),
-            amount_cents=transaction_total_cents(cart_items),
+            amount_cents=total_cents,
             currency="usd",
             notes=str(error),
         )
@@ -401,9 +468,9 @@ def create_stripe_checkout_session(request):
         customer_name=customer_name,
         customer_email=customer_email,
         items=transaction_items(cart_items),
-        amount_cents=transaction_total_cents(cart_items),
+        amount_cents=total_cents,
         currency="usd",
-        notes="Stripe Checkout session created.",
+        notes=f"Stripe Checkout session created. Subtotal: {subtotal_cents}. Discount: {discount_cents}. Coupon: {coupon.code if coupon else 'none'}.",
     )
 
     notify_temp_gmail(
@@ -412,6 +479,8 @@ def create_stripe_checkout_session(request):
             f"Items: {', '.join(summary_lines)}",
             f"Name: {customer_name or 'N/A'}",
             f"Email: {customer_email or 'N/A'}",
+            f"Coupon: {coupon.code if coupon else 'N/A'}",
+            f"Discount cents: {discount_cents}",
             "Provider: Stripe Checkout",
         ],
     )
@@ -427,6 +496,7 @@ def create_paypal_order(request):
     payload = json.loads(request.body or "{}")
     customer_name = (payload.get("customer_name") or "").strip()
     customer_email = (payload.get("customer_email") or "").strip()
+    coupon_code = normalize_coupon_code(payload.get("coupon_code"))
     cart_items = parse_cart_items(payload)
     if not cart_items:
         slug = payload.get("slug", "")
@@ -439,7 +509,9 @@ def create_paypal_order(request):
     purchase_units = []
     summary_lines = []
 
-    total_cents = transaction_total_cents(cart_items)
+    subtotal_cents, discount_cents, total_cents, coupon = checkout_amounts(cart_items, coupon_code)
+    if coupon_code and not coupon:
+        return JsonResponse({"error": "Coupon code was not found."}, status=400)
     for product, quantity in cart_items:
         summary_lines.append(f"{product['name']} x {quantity}")
     purchase_units.append(
@@ -476,7 +548,7 @@ def create_paypal_order(request):
             items=transaction_items(cart_items),
             amount_cents=total_cents,
             currency="usd",
-            notes=message,
+            notes=f"{message} Coupon: {coupon.code if coupon else 'none'}. Discount: {discount_cents}.",
         )
         return JsonResponse({"error": message}, status=400)
 
@@ -486,6 +558,8 @@ def create_paypal_order(request):
             f"Items: {', '.join(summary_lines)}",
             f"Name: {customer_name or 'N/A'}",
             f"Email: {customer_email or 'N/A'}",
+            f"Coupon: {coupon.code if coupon else 'N/A'}",
+            f"Discount cents: {discount_cents}",
             "Provider: PayPal",
         ],
     )
@@ -500,7 +574,7 @@ def create_paypal_order(request):
         items=transaction_items(cart_items),
         amount_cents=total_cents,
         currency="usd",
-        notes="PayPal order created.",
+        notes=f"PayPal order created. Subtotal: {subtotal_cents}. Discount: {discount_cents}. Coupon: {coupon.code if coupon else 'none'}.",
     )
 
     return JsonResponse({"order_id": order_id})

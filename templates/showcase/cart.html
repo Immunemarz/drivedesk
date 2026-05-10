@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="icon" href="{% static 'images/drivedesk-logo.svg' %}" type="image/svg+xml">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=coupons-20260510">
     <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body>
@@ -38,6 +38,19 @@
                 <div class="cart-line">
                     <span>Subtotal</span>
                     <strong id="cart-subtotal">$0.00</strong>
+                </div>
+                <form class="coupon-form">
+                    <label for="coupon-code">Coupon code</label>
+                    <div class="coupon-row">
+                        <input id="coupon-code" type="text" placeholder="Enter code" autocomplete="off">
+                        <button type="submit">Apply</button>
+                    </div>
+                    <button id="remove-coupon-button" class="coupon-remove" type="button" hidden>Remove coupon</button>
+                    <small id="coupon-status" class="coupon-status" aria-live="polite"></small>
+                </form>
+                <div id="cart-discount-line" class="cart-line" hidden>
+                    <span>Discount</span>
+                    <strong id="cart-discount">-$0.00</strong>
                 </div>
                 <div class="cart-line total">
                     <span>Total</span>
