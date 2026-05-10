@@ -139,6 +139,17 @@ def stripe_is_configured():
     return bool(settings.STRIPE_PUBLISHABLE_KEY and settings.STRIPE_SECRET_KEY)
 
 
+def stripe_configuration_error():
+    missing = []
+    if not settings.STRIPE_PUBLISHABLE_KEY:
+        missing.append("STRIPE_PUBLISHABLE_KEY")
+    if not settings.STRIPE_SECRET_KEY:
+        missing.append("STRIPE_SECRET_KEY")
+    if not missing:
+        return ""
+    return f"Stripe is not configured. Missing: {', '.join(missing)}."
+
+
 def notify_temp_gmail(subject, lines):
     body = "\n".join(lines)
     send_mail(
@@ -276,8 +287,9 @@ def send_feedback(request):
 
 @require_POST
 def create_stripe_checkout_session(request):
-    if not stripe_is_configured():
-        return JsonResponse({"error": "Stripe is not configured. Add both Stripe keys."}, status=400)
+    configuration_error = stripe_configuration_error()
+    if configuration_error:
+        return JsonResponse({"error": configuration_error}, status=400)
 
     payload = json.loads(request.body or "{}")
     customer_name = (payload.get("customer_name") or "").strip()
@@ -330,7 +342,7 @@ def create_stripe_checkout_session(request):
             mode="payment",
             line_items=line_items,
             customer_email=customer_email or None,
-            automatic_payment_methods={"enabled": True},
+            payment_method_types=["card"],
             metadata={
                 "items": " | ".join(summary_lines),
                 "customer_name": customer_name,
