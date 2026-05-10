@@ -27,6 +27,10 @@ def csv_env(name, default=""):
     return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
 
 
+def env_value(name, default=""):
+    return os.getenv(name, default).strip().strip('"').strip("'")
+
+
 def normalize_allowed_host(value):
     host = value.strip()
     if "://" in host:
@@ -141,11 +145,11 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@drivedesk.local")
 ORDER_NOTIFICATION_EMAIL = "temp@gmail.com"
 
-SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
-PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
-PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
-PAYPAL_API_BASE = os.getenv("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
+SITE_URL = env_value("SITE_URL", "http://127.0.0.1:8000").rstrip("/")
+STRIPE_PUBLISHABLE_KEY = env_value("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = env_value("STRIPE_SECRET_KEY")
+PAYPAL_CLIENT_ID = env_value("PAYPAL_CLIENT_ID")
+PAYPAL_CLIENT_SECRET = env_value("PAYPAL_CLIENT_SECRET")
+PAYPAL_API_BASE = env_value("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com").rstrip("/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
