@@ -55,6 +55,7 @@ STRIPE_PUBLISHABLE_KEY=
 STRIPE_SECRET_KEY=
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=
+PAYPAL_API_BASE=https://api-m.paypal.com
 ```
 
 Use `.env.example` as the template and keep `.env` local.

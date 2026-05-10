@@ -153,6 +153,6 @@ STRIPE_PUBLISHABLE_KEY = env_value(
 STRIPE_SECRET_KEY = env_value("STRIPE_SECRET_KEY")
 PAYPAL_CLIENT_ID = env_value("PAYPAL_CLIENT_ID")
 PAYPAL_CLIENT_SECRET = env_value("PAYPAL_CLIENT_SECRET")
-PAYPAL_API_BASE = env_value("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com").rstrip("/")
+PAYPAL_API_BASE = env_value("PAYPAL_API_BASE", "https://api-m.paypal.com").rstrip("/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

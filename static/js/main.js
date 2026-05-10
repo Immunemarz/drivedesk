@@ -363,8 +363,8 @@ if (window.paypal && checkoutPage) {
             }
             window.location.href = result.redirect_url;
         },
-        onError() {
-            paypalStatus.textContent = "PayPal checkout could not be started. Check your PayPal keys.";
+        onError(error) {
+            paypalStatus.textContent = error?.message || "PayPal checkout could not be started. Check your PayPal keys.";
         },
     }).render("#paypal-button-container");
 }

@@ -196,6 +196,17 @@ def paypal_access_token():
     return response.json()["access_token"]
 
 
+def paypal_error_message(error):
+    response = getattr(error, "response", None)
+    if response is None:
+        return str(error)
+    try:
+        details = response.json()
+    except ValueError:
+        return response.text or str(error)
+    return details.get("message") or details.get("name") or str(details)
+
+
 @ensure_csrf_cookie
 def home(request):
     featured_products = [
@@ -433,21 +444,35 @@ def create_paypal_order(request):
         }
     )
 
-    access_token = paypal_access_token()
-    response = requests.post(
-        f"{settings.PAYPAL_API_BASE}/v2/checkout/orders",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "intent": "CAPTURE",
-            "purchase_units": purchase_units,
-            "payment_source": {"paypal": {"experience_context": {"shipping_preference": "NO_SHIPPING"}}},
-        },
-        timeout=20,
-    )
-    response.raise_for_status()
+    try:
+        access_token = paypal_access_token()
+        response = requests.post(
+            f"{settings.PAYPAL_API_BASE}/v2/checkout/orders",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "intent": "CAPTURE",
+                "purchase_units": purchase_units,
+                "payment_source": {"paypal": {"experience_context": {"shipping_preference": "NO_SHIPPING"}}},
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+    except requests.RequestException as error:
+        message = paypal_error_message(error)
+        TransactionLog.objects.create(
+            provider=TransactionLog.PROVIDER_PAYPAL,
+            status=TransactionLog.STATUS_FAILED,
+            customer_name=customer_name,
+            customer_email=customer_email,
+            items=transaction_items(cart_items),
+            amount_cents=total_cents,
+            currency="usd",
+            notes=message,
+        )
+        return JsonResponse({"error": message}, status=400)
 
     notify_temp_gmail(
         "PayPal checkout started",
@@ -495,16 +520,24 @@ def capture_paypal_order(request):
         product = get_product_or_404(slug)
         summary_lines = [f"{product['name']} x {quantity}"]
 
-    access_token = paypal_access_token()
-    response = requests.post(
-        f"{settings.PAYPAL_API_BASE}/v2/checkout/orders/{order_id}/capture",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-        },
-        timeout=20,
-    )
-    response.raise_for_status()
+    try:
+        access_token = paypal_access_token()
+        response = requests.post(
+            f"{settings.PAYPAL_API_BASE}/v2/checkout/orders/{order_id}/capture",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+    except requests.RequestException as error:
+        message = paypal_error_message(error)
+        TransactionLog.objects.filter(
+            provider=TransactionLog.PROVIDER_PAYPAL,
+            external_id=order_id,
+        ).update(status=TransactionLog.STATUS_FAILED, notes=message)
+        return JsonResponse({"error": message}, status=400)
 
     TransactionLog.objects.filter(
         provider=TransactionLog.PROVIDER_PAYPAL,
