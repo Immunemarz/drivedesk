@@ -77,7 +77,7 @@ PRODUCTS = [
         "name": "Seat-Gap Organizer",
         "slug": "seat-gap-organizer",
         "category": "Car",
-        "price": "$29",
+        "price": "$2.90",
         "price_cents": 290,
         "tagline": "A simple fix for keys, cards, receipts, and cables.",
         "details": "Slim organizer with card sleeve, cable notch, and soft-touch interior.",
